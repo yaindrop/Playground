@@ -15,8 +15,14 @@ const _timeStrToNumber = (t) => {
 
 const getVideoTime = () => _timeStrToNumber(document.getElementsByClassName("bilibili-player-video-time-now")[0].innerHTML)
 const setVideoTime = (sec, part) => window.commentAgent.seek(sec, part ? part : -1)
-const videoHasPart = () => document.getElementsByClassName("list-box").length > 0
-const getVideoPart = () => Array.from(document.getElementsByClassName("list-box")[0].childNodes).findIndex(e => e.classList.contains("on")) + 1;
+const getVideoPart = () => {
+    var listElement = document.getElementsByClassName("list-box").length ?
+        document.getElementsByClassName("list-box")[0] :
+        document.getElementsByClassName("module-box").length ?
+            document.getElementsByClassName("module-box")[0] :
+            null
+    return listElement ? Array.from(listElement).findIndex(e => e.classList.contains("on")) + 1 : 0;
+}
 
 const setVideoLoop = (startSec, endSec, part) => {
     setVideoTime(startSec, part)
@@ -24,7 +30,8 @@ const setVideoLoop = (startSec, endSec, part) => {
     setTimeout(() => {
         var interval = setInterval(() => {
             var checkTime = getVideoTime()
-            if (videoHasPart() && getVideoPart() !== startPart) {
+            var checkPart = getVideoPart()
+            if (checkPart && checkPart !== startPart) {
                 console.log("cleared switching parts")
                 clearInterval(interval)
                 return
